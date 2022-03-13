@@ -7,7 +7,7 @@ using UnityEngine;
 public class Insult
 {
     public string insultText;
-    public int counterText;
+    public string counterText;
 
     public Insult(Insult insult)
     {

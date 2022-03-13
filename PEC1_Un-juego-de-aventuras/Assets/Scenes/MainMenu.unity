@@ -892,6 +892,7 @@ MonoBehaviour:
   newGameButton: {fileID: 1682622006}
   loadGameButton: {fileID: 2017098808}
   exitGameButton: {fileID: 446395159}
+  jsonText: {fileID: 4900000, guid: ea688b7e2a61aef4fa0b2f3d1786335a, type: 3}
 --- !u!4 &1152062350
 Transform:
   m_ObjectHideFlags: 0
