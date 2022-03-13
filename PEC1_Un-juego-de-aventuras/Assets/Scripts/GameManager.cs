@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,17 +8,27 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public Button newGameButton;
-    public Button loadGameButton;
     public Button exitGameButton;
     public TextAsset jsonText;
+    public GameObject buttonPrefab;
+    public GameObject insultUIPrefab;
+
+    private string currentState;
+    private Insults insults;
+    private List<Insult> roundInsults;
+    
     
 
     // Start is called before the first frame update
     private void Start()
     {
+        roundInsults = new List<Insult>();
         AddListener(newGameButton);       
         exitGameButton.onClick.AddListener(ExitGame);
-        FileManager.LoadInsults(jsonText);
+        insults = FileManager.LoadInsults(jsonText);
+        SelectFirstPlayer();
+        PrepareRoundInsults();
+        PrepareUI();
     }
 
     // Update is called once per frame
@@ -36,7 +47,6 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("Game"); 
     }
 
-
     private void ExitGame()
     {
         Application.Quit();
@@ -46,4 +56,80 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("EndGame");
     }
+
+    public void SelectFirstPlayer()
+    {
+        int startPlayer = Random.Range(0, 1);
+        if(startPlayer == 1)
+        {
+            currentState = GameStates.playerInsult;
+        }
+        else
+        {
+            currentState = GameStates.enemyInsult;
+        }
+        PrepareRoundInsults();
+    }
+
+    public void SetNextState()
+    {
+        switch (currentState)
+        {
+            case GameStates.enemyInsult:
+                {
+                    currentState = GameStates.playerResponse;
+                    break;
+                }
+
+            case GameStates.enemyResponse:
+                {
+                    currentState = GameStates.resolveRound;
+                    break;
+                }
+            case GameStates.playerInsult:
+                {
+                    currentState = GameStates.enemyResponse;
+                    break;
+                }
+        }
+    }
+
+    private void PrepareUI()
+    {
+        int index = 4;
+        foreach(Insult insult in roundInsults)
+        {            
+            GameObject insultButton = Instantiate(buttonPrefab, insultUIPrefab.transform, true);
+            insultButton.transform.SetParent(insultUIPrefab.transform);
+            insultButton.GetComponentInChildren<TextMeshProUGUI>().text = insult.insultText;
+            insultButton.GetComponent<RectTransform>().localPosition = new Vector3(0, transform.localPosition.y + index, 0);
+            AddInsultListener(insultButton.GetComponent<Button>());
+            index += 60;
+        }
+    }
+
+    private void AddInsultListener(Button button)
+    {
+        button.onClick.AddListener(() => { SetNextState(); });
+    }
+
+    private void PrepareRoundInsults()
+    {
+        roundInsults.Clear();
+        while(roundInsults.Count < 5)
+        {
+            Insult insult = GetRandomInsult();
+            if (!roundInsults.Contains(insult)){
+                roundInsults.Add(insult);
+            }
+        }
+    }
+
+    private Insult GetRandomInsult()
+    {
+        int index = Random.Range(0, insults.insults.Length);
+        return insults.insults.GetValue(index) as Insult;
+    }
+
+   
 }
