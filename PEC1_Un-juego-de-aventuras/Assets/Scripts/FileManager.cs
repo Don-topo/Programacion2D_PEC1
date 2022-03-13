@@ -14,4 +14,22 @@ public static class FileManager
         // TODO Update file content
         // TODO Add new file
     }
+
+    public static Insult[] loadInsults()
+    {
+        string filePath = Application.persistentDataPath + "/insults";
+        if (File.Exists(filePath))
+        {
+            Insult[] insults;
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            FileStream fileStream = new FileStream(filePath, FileMode.Open);
+            insults = binaryFormatter.Deserialize(fileStream) as Insult[];
+            fileStream.Close();
+            return insults;
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

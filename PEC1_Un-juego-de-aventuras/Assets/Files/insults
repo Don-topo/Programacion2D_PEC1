@@ -1,0 +1,132 @@
+{
+"insults": [
+   {
+     "instultText": "You fight like a dairy Farmer!",
+	 "counterText": "How appropriate. You fight like a cow!"
+	},
+   {
+     "instultText": "This is the END for you, you gutter crawling cur!",
+	 "counterText": "And I've got a little TIP for you, get the POINT?"
+	},
+   {
+     "instultText": "I've spoken with apes more polite than you!",
+	 "counterText": "I'm glad to hear you attended your family reunion!"
+	},
+   {
+     "instultText": "Soon you'll be wearing my sword like a shish kebab!",
+	 "counterText": "First you'd better stop waving it like a feather duster."
+	},
+   {
+     "instultText": "People fall at my feet when they see me coming!",
+     "counterText": "Even BEFORE they smell your breath?"
+   },
+   {
+     "instultText": "I'm not going to take your insolence sitting down!",
+	 "counterText": "Your hemorrhoids are flaring up again eh?"
+   },
+   {
+     "instultText": "I once owned a dog that was smarter than you.",
+	 "counterText": "He must have taught you everything you know."
+   },
+   {
+     "instultText": "Nobody's ever drawn blood from me and nobody ever will.",
+	 "counterText": "You run THAT fast?"
+   },
+   {
+     "instultText": "Have you stopped wearing diapers yet?",
+	 "counterText": "Why? Did you want to borrow one?"
+   },
+   {
+     "instultText": "There are no words for how disgusting you are.",
+	 "counterText": "Yes, there are. You just never learned them."
+   },
+   {
+     "instultText": "You make me want to puke.",
+	 "counterText": "You make me think somebody already did."
+   },
+   {
+     "instultText": "My handkerchief will wipe up your blood!",
+	 "counterText": "So you got that job as janitor, after all."
+   },
+   {
+     "instultText": "I got this scar on my face during a mighty struggle!",
+	 "counterText": "I hope now you've learned to stop picking your nose."
+   },
+   {
+     "instultText": "I've heard you are a contemptible sneak.",
+	 "counterText": "Too bad no one's ever heard of YOU at all."
+   },
+   {
+     "instultText": "You're no match for my brains, you poor fool.",
+	 "counterText": "I'd be in real trouble if you ever used them."
+   },
+   {
+     "instultText": "You have the manners of a beggar.",
+	 "counterText": "I wanted to make sure you'd feel comfortable with me."
+   },
+   {
+     "instultText": "Now I know what filth and stupidity really are.",
+	 "counterText": "I'm glad to hear you attended your family reunion."
+   },
+   {
+     "instultText": "Every word you say to me is stupid.",
+	 "counterText": "I wanted to make sure you'd feel comfortable with me."
+   },   
+   {
+     "instultText": "I've got a long, sharp lesson for you to learn today.",
+	 "counterText": "And I've got a little TIP for you. Get the POINT?"
+   }, 
+   {
+     "instultText": "I will milk every drop of blood from your body!",
+	 "counterText": "How appropriate, you fight like a cow!"
+   },
+   {
+     "instultText": "I've got the courage and skill of a master swordsman.",
+	 "counterText": "I'd be in real trouble if you ever used them."
+   },
+   {   
+     "instultText": "My tongue is sharper than any sword.",
+	 "counterText": "First, you'd better stop waving it like a feather-duster."
+   },
+   {   
+     "instultText": "My name is feared in every dirty corner of this island!",
+	 "counterText": "So you got that job as a janitor, after all."
+   },
+   {   
+     "instultText": "My wisest enemies run away at the first sight of me!",
+	 "counterText": "Even BEFORE they smell your breath?"
+   },
+   {   
+     "instultText": "Only once have I met such a coward!",
+	 "counterText": "He must have taught you everything you know."
+   },
+   {   
+     "instultText": "If your brother's like you, better to marry a pig.",
+	 "counterText": "You make me think somebody already did."
+   },
+   {   
+     "instultText": "No one will ever catch ME fighting as badly as you do.",
+	 "counterText": "You run THAT fast?"
+   },
+   {   
+     "instultText": "My last fight ended with my hands covered with blood.",
+	 "counterText": "I hope now you've learned to stop picking your nose."
+   },
+   {   
+     "instultText": "I hope you have a boat ready for a quick escape.",
+	 "counterText": "Why, did you want to borrow one?"
+   },
+   {   
+     "instultText": "My sword is famous all over the Caribbean!",
+	 "counterText": "Too bad no one's ever heard of YOU at all."
+   },
+   {   
+     "instultText": "You are a pain in the backside, sir!",
+	 "counterText": "Your hemorrhoids are flaring up again, eh?"
+   },
+   {   
+     "instultText": "There are no clever moves that can help you now.",
+	 "counterText": "Yes, there are. You just never learned them."
+   }
+   ]
+}
