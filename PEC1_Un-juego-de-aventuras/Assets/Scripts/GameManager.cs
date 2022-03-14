@@ -16,6 +16,11 @@ public class GameManager : MonoBehaviour
     private string currentState;
     private Insults insults;
     private List<Insult> roundInsults;
+    private Insult playerInsult;
+    private Insult enemyInsult;
+    private int playerLife = 5;
+    private int enemyLife = 5;
+    private List<GameObject> buttons;
     
     
 
@@ -27,8 +32,6 @@ public class GameManager : MonoBehaviour
         exitGameButton.onClick.AddListener(ExitGame);
         insults = FileManager.LoadInsults(jsonText);
         SelectFirstPlayer();
-        PrepareRoundInsults();
-        PrepareUI();
     }
 
     // Update is called once per frame
@@ -68,7 +71,7 @@ public class GameManager : MonoBehaviour
         {
             currentState = GameStates.enemyInsult;
         }
-        PrepareRoundInsults();
+        SetNextState();
     }
 
     public void SetNextState()
@@ -77,18 +80,41 @@ public class GameManager : MonoBehaviour
         {
             case GameStates.enemyInsult:
                 {
+                    EnemyInsult();
                     currentState = GameStates.playerResponse;
+                    SetNextState();
                     break;
                 }
 
             case GameStates.enemyResponse:
                 {
+                    EnemyInsult();
                     currentState = GameStates.resolveRound;
+                    SetNextState();
                     break;
                 }
             case GameStates.playerInsult:
                 {
+                    PrepareUI();
                     currentState = GameStates.enemyResponse;
+                    SetNextState();
+                    break;
+                }
+            case GameStates.playerResponse:
+                {
+                    PrepareUI();
+                    currentState = GameStates.resolveRound;
+                    SetNextState();
+                    break;
+                }
+            case GameStates.resolveRound:
+                {
+                    ResolveRound();
+                    break;
+                }
+            case GameStates.selectPlayer:
+                {
+                    PrepareRoundInsults();
                     break;
                 }
         }
@@ -104,13 +130,25 @@ public class GameManager : MonoBehaviour
             insultButton.GetComponentInChildren<TextMeshProUGUI>().text = insult.insultText;
             insultButton.GetComponent<RectTransform>().localPosition = new Vector3(0, transform.localPosition.y + index, 0);
             AddInsultListener(insultButton.GetComponent<Button>());
+            buttons.Add(insultButton);
             index += 60;
+        }
+    }
+
+    private void DeleteUI()
+    {
+        foreach(GameObject button in buttons)
+        {
+            Destroy(button);
         }
     }
 
     private void AddInsultListener(Button button)
     {
-        button.onClick.AddListener(() => { SetNextState(); });
+        button.onClick.AddListener(() => {
+            DeleteUI();
+            SetNextState(); 
+        });
     }
 
     private void PrepareRoundInsults()
@@ -123,6 +161,33 @@ public class GameManager : MonoBehaviour
                 roundInsults.Add(insult);
             }
         }
+    }
+
+    private void EnemyInsult()
+    {
+        enemyInsult = roundInsults[Random.Range(0, roundInsults.Count)];      
+    }
+
+    private void PlayerInsult(Button button)
+    {
+        // TODO delete Buttons UI
+        // TODO Catch insult
+        // TODO NextState
+    }
+
+    private void ResolveRound()
+    {
+        // TODO who win?
+        if(playerInsult.counterText != enemyInsult.insultText)
+        {
+            // player win
+        } else
+        {
+            // enemy win
+        }        
+        // TODO set next firstPlayer
+        // TODO is game ended? => load scene
+        // TODO nextState
     }
 
     private Insult GetRandomInsult()
