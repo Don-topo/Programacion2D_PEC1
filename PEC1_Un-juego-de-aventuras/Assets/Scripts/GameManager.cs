@@ -12,15 +12,18 @@ public class GameManager : MonoBehaviour
     public TextAsset jsonText;
     public GameObject buttonPrefab;
     public GameObject insultUIPrefab;
+    public GameObject playerPrefab;
+    public GameObject enemyPrefab;
 
     private string currentState;
     private Insults insults;
     private List<Insult> roundInsults;
     private Insult playerInsult;
     private Insult enemyInsult;
-    private int playerLife = 5;
-    private int enemyLife = 5;
+    private int playerHealth = 5;
+    private int enemyHealth = 5;
     private List<GameObject> buttons;
+    private string firstPlayer;
     
     
 
@@ -28,10 +31,14 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         roundInsults = new List<Insult>();
+        buttons = new List<GameObject>();
         AddListener(newGameButton);       
         exitGameButton.onClick.AddListener(ExitGame);
         insults = FileManager.LoadInsults(jsonText);
+        Debug.LogError("Select first player");
         SelectFirstPlayer();
+        SetNextState();
+      
     }
 
     // Update is called once per frame
@@ -66,12 +73,14 @@ public class GameManager : MonoBehaviour
         if(startPlayer == 1)
         {
             currentState = GameStates.playerInsult;
+            firstPlayer = "player";
         }
         else
         {
             currentState = GameStates.enemyInsult;
+            firstPlayer = "enemy";
         }
-        SetNextState();
+        Debug.LogError("Next player " + currentState);
     }
 
     public void SetNextState()
@@ -80,6 +89,8 @@ public class GameManager : MonoBehaviour
         {
             case GameStates.enemyInsult:
                 {
+                    Debug.LogError("EnemyInsult");
+                    PrepareRoundInsults();
                     EnemyInsult();
                     currentState = GameStates.playerResponse;
                     SetNextState();
@@ -88,6 +99,7 @@ public class GameManager : MonoBehaviour
 
             case GameStates.enemyResponse:
                 {
+                    Debug.LogError("EnemyResponse");
                     EnemyInsult();
                     currentState = GameStates.resolveRound;
                     SetNextState();
@@ -95,25 +107,27 @@ public class GameManager : MonoBehaviour
                 }
             case GameStates.playerInsult:
                 {
+                    Debug.LogError("PlayerInsult");
+                    PrepareRoundInsults();
                     PrepareUI();
-                    currentState = GameStates.enemyResponse;
-                    SetNextState();
                     break;
                 }
             case GameStates.playerResponse:
                 {
+                    Debug.LogError("PlayerResonse");
                     PrepareUI();
                     currentState = GameStates.resolveRound;
-                    SetNextState();
                     break;
                 }
             case GameStates.resolveRound:
                 {
+                    Debug.LogError("ResolveRound");
                     ResolveRound();
                     break;
                 }
             case GameStates.selectPlayer:
                 {
+                    Debug.LogError("SelectPlayer");
                     PrepareRoundInsults();
                     break;
                 }
@@ -147,7 +161,8 @@ public class GameManager : MonoBehaviour
     {
         button.onClick.AddListener(() => {
             DeleteUI();
-            SetNextState(); 
+            playerInsult = roundInsults[Random.Range(0, roundInsults.Count - 1)];
+            PlayerInsult(button);
         });
     }
 
@@ -165,29 +180,71 @@ public class GameManager : MonoBehaviour
 
     private void EnemyInsult()
     {
-        enemyInsult = roundInsults[Random.Range(0, roundInsults.Count)];      
+        enemyInsult = roundInsults[Random.Range(0, roundInsults.Count-1)];      
     }
 
     private void PlayerInsult(Button button)
     {
-        // TODO delete Buttons UI
+        DeleteUI();
         // TODO Catch insult
-        // TODO NextState
+        if (currentState.Equals(GameStates.playerInsult))
+        {
+            currentState = GameStates.enemyResponse;
+        }
+        else
+        {
+            currentState = GameStates.resolveRound;
+        }
+        SetNextState();
     }
 
     private void ResolveRound()
     {
         // TODO who win?
-        if(playerInsult.counterText != enemyInsult.insultText)
+        if(firstPlayer == "player")
         {
-            // player win
-        } else
+            if(playerInsult.counterText != enemyInsult.insultText)
+            {
+                // Player wins
+                Debug.LogError("Player wins");
+                enemyHealth--;
+                currentState = GameStates.playerInsult;
+            }
+            else
+            {
+                // Enemy parry
+                Debug.LogError("Enemy wins");
+                currentState = GameStates.enemyInsult;
+                firstPlayer = "enemy";
+            }
+        }
+        else
         {
-            // enemy win
-        }        
-        // TODO set next firstPlayer
-        // TODO is game ended? => load scene
-        // TODO nextState
+            if(enemyInsult.counterText != playerInsult.insultText)
+            {
+                // Enemy wins
+                Debug.LogError("Enemy wins");
+                playerHealth--;
+                currentState = GameStates.enemyInsult;
+            }
+            else
+            {
+                // Player parry
+                Debug.LogError("Player wins");
+                currentState = GameStates.playerInsult;
+                firstPlayer = "player";
+            }
+        }
+        CheckIfGameIsEnded();
+        SetNextState();
+    }
+
+    private void CheckIfGameIsEnded()
+    {
+        if(playerHealth <= 0 || enemyHealth <= 0)
+        {
+            SceneManager.LoadScene("EndGame");
+        }
     }
 
     private Insult GetRandomInsult()

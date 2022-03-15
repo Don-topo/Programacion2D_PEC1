@@ -793,6 +793,8 @@ MonoBehaviour:
   jsonText: {fileID: 4900000, guid: ea688b7e2a61aef4fa0b2f3d1786335a, type: 3}
   buttonPrefab: {fileID: 4751188749876387259, guid: c2abc48136832cf45945e9b668d98a85, type: 3}
   insultUIPrefab: {fileID: 680620625}
+  playerPrefab: {fileID: 6534741063239615980, guid: 45acc747015db124190722623dd9f76c, type: 3}
+  enemyPrefab: {fileID: 6014225912324569243, guid: 0f203086354cf1946a5a0f12a1b50a1f, type: 3}
 --- !u!4 &1152062350
 Transform:
   m_ObjectHideFlags: 0
