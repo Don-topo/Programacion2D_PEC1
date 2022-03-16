@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     public GameObject playerPrefab;
     public GameObject enemyPrefab;
     public Canvas pauseCanvas;
+    public Sprite[] healthSprites;
+    public Image playerHealthBar;
+    public Image enemyHealthBar;
 
     private string currentState;
     private Insults insults;
@@ -143,7 +146,7 @@ public class GameManager : MonoBehaviour
 
     private void PrepareUI()
     {
-        int index = 4;
+        int index = -20;
         foreach(Insult insult in roundInsults)
         {            
             GameObject insultButton = Instantiate(buttonPrefab, insultUIPrefab.transform, true);
@@ -152,7 +155,7 @@ public class GameManager : MonoBehaviour
             insultButton.GetComponent<RectTransform>().localPosition = new Vector3(0, transform.localPosition.y + index, 0);
             AddInsultListener(insultButton.GetComponent<Button>());
             buttons.Add(insultButton);
-            index += 60;
+            index -= 40;
         }
     }
 
@@ -215,6 +218,7 @@ public class GameManager : MonoBehaviour
                 // Player wins
                 Debug.LogError("Player wins");
                 enemyHealth--;
+                enemyHealthBar.sprite = healthSprites[enemyHealth];
                 playerPrefab.GetComponent<Animator>().SetTrigger("PlayerAttack");
                 enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyHit");
                 // TODO play sounds here
@@ -237,6 +241,7 @@ public class GameManager : MonoBehaviour
                 // Enemy wins
                 Debug.LogError("Enemy wins");
                 playerHealth--;
+                playerHealthBar.sprite = healthSprites[playerHealth];
                 currentState = GameStates.enemyInsult;
                 enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
                 playerPrefab.GetComponent<Animator>().SetTrigger("PlayerHit");
