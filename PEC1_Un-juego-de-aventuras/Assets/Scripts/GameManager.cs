@@ -7,13 +7,12 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public Button newGameButton;
-    public Button exitGameButton;
     public TextAsset jsonText;
     public GameObject buttonPrefab;
     public GameObject insultUIPrefab;
     public GameObject playerPrefab;
     public GameObject enemyPrefab;
+    public Canvas pauseCanvas;
 
     private string currentState;
     private Insults insults;
@@ -24,7 +23,7 @@ public class GameManager : MonoBehaviour
     private int enemyHealth = 5;
     private List<GameObject> buttons;
     private string firstPlayer;
-    
+    private bool isGamePaused = false;
     
 
     // Start is called before the first frame update
@@ -32,8 +31,22 @@ public class GameManager : MonoBehaviour
     {
         roundInsults = new List<Insult>();
         buttons = new List<GameObject>();
-        AddListener(newGameButton);       
-        exitGameButton.onClick.AddListener(ExitGame);    
+        StartNewGame();
+    }
+
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (isGamePaused)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
+        }
     }
 
     private void StartNewGame()
@@ -44,29 +57,24 @@ public class GameManager : MonoBehaviour
         SetNextState();
     }
 
-    private void AddListener(Button button)
+    public void PauseGame()
     {
-        button.onClick.AddListener(() => { StartGame(); });
+        pauseCanvas.gameObject.SetActive(true);
+        isGamePaused = true;
     }
 
-    private void StartGame()
+    public void ResumeGame()
     {
-        SceneManager.LoadScene("Game");
-        new WaitForSeconds(5);
-        StartNewGame();
+        pauseCanvas.gameObject.SetActive(false);
+        isGamePaused = false;
     }
 
-    private void ExitGame()
+    public void ExitGame()
     {
-        Application.Quit();
+        SceneManager.LoadScene("MainMenu");
     }
 
-    public static void EndGame()
-    {
-        SceneManager.LoadScene("EndGame");
-    }
-
-    public void SelectFirstPlayer()
+    private void SelectFirstPlayer()
     {
         int startPlayer = Random.Range(0, 1);
         if(startPlayer == 1)
