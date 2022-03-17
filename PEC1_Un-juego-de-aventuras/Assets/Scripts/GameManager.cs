@@ -16,6 +16,10 @@ public class GameManager : MonoBehaviour
     public Sprite[] healthSprites;
     public Image playerHealthBar;
     public Image enemyHealthBar;
+    public TextMeshProUGUI playerBaloon;
+    public TextMeshProUGUI enemyBaloon;
+    public AudioClip attackClip;
+    public AudioClip hitClip;
 
     private string currentState;
     private Insults insults;
@@ -170,8 +174,7 @@ public class GameManager : MonoBehaviour
     private void AddInsultListener(Button button)
     {
         button.onClick.AddListener(() => {
-            DeleteUI();
-            playerInsult = roundInsults[Random.Range(0, roundInsults.Count - 1)];
+            DeleteUI();            
             PlayerInsult(button);
         });
     }
@@ -190,27 +193,43 @@ public class GameManager : MonoBehaviour
 
     private void EnemyInsult()
     {
-        enemyInsult = roundInsults[Random.Range(0, roundInsults.Count-1)];      
+        enemyInsult = roundInsults[Random.Range(0, roundInsults.Count-1)];
+        if(currentState == GameStates.enemyInsult)
+        {
+            enemyBaloon.SetText(enemyInsult.insultText);
+        }
+        else
+        {
+            enemyBaloon.SetText(enemyInsult.counterText);
+        }
+        enemyBaloon.gameObject.SetActive(true);
     }
 
     private void PlayerInsult(Button button)
     {
         DeleteUI();
+        playerInsult = roundInsults[Random.Range(0, roundInsults.Count - 1)];
         // TODO Catch insult
         if (currentState.Equals(GameStates.playerInsult))
         {
             currentState = GameStates.enemyResponse;
+            playerBaloon.SetText(playerInsult.insultText);
         }
         else
         {
             currentState = GameStates.resolveRound;
+            playerBaloon.SetText(playerInsult.counterText);
         }
+        playerBaloon.gameObject.SetActive(true);
         SetNextState();
     }
 
     // TODO Refactor this a lot of code is duplicated and is not efficient
     private void ResolveRound()
     {
+        StartCoroutine(WaitRound(3));
+        //playerBaloon.gameObject.SetActive(false);
+        enemyBaloon.gameObject.SetActive(false);
         if(firstPlayer == "player")
         {
             if(playerInsult.counterText != enemyInsult.insultText)
@@ -220,8 +239,11 @@ public class GameManager : MonoBehaviour
                 enemyHealth--;
                 enemyHealthBar.sprite = healthSprites[enemyHealth];
                 playerPrefab.GetComponent<Animator>().SetTrigger("PlayerAttack");
+                playerPrefab.GetComponent<AudioSource>().clip = attackClip;
+                playerPrefab.GetComponent<AudioSource>().Play();
                 enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyHit");
-                // TODO play sounds here
+                enemyPrefab.GetComponent<AudioSource>().clip = hitClip;
+                enemyPrefab.GetComponent<AudioSource>().Play();
                 currentState = GameStates.playerInsult;
             }
             else
@@ -230,7 +252,8 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("Enemy wins");
                 currentState = GameStates.enemyInsult;
                 enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
-                // TODO play sounds here
+                enemyPrefab.GetComponent<AudioSource>().clip = attackClip;
+                enemyPrefab.GetComponent<AudioSource>().Play();
                 firstPlayer = "enemy";
             }
         }
@@ -244,8 +267,11 @@ public class GameManager : MonoBehaviour
                 playerHealthBar.sprite = healthSprites[playerHealth];
                 currentState = GameStates.enemyInsult;
                 enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
+                enemyPrefab.GetComponent<AudioSource>().clip = attackClip;
+                enemyPrefab.GetComponent<AudioSource>().Play();
                 playerPrefab.GetComponent<Animator>().SetTrigger("PlayerHit");
-                // TODO play sounds here
+                playerPrefab.GetComponent<AudioSource>().clip = hitClip;
+                playerPrefab.GetComponent<AudioSource>().Play();
             }
             else
             {
@@ -253,13 +279,22 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("Player wins");
                 currentState = GameStates.playerInsult;
                 enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
+                enemyPrefab.GetComponent<AudioSource>().clip = attackClip;
+                enemyPrefab.GetComponent<AudioSource>().Play();
                 playerPrefab.GetComponent<Animator>().SetTrigger("PlayerAttack");
+                playerPrefab.GetComponent<AudioSource>().clip = attackClip;
+                playerPrefab.GetComponent<AudioSource>().Play();
                 // TODO play sounds here
                 firstPlayer = "player";
             }
         }
         CheckIfGameIsEnded();
         SetNextState();
+    }
+
+    private IEnumerator WaitRound(float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
     }
 
     private void CheckIfGameIsEnded()
