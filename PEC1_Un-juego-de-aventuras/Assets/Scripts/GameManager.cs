@@ -26,8 +26,8 @@ public class GameManager : MonoBehaviour
     private string currentState;
     private Insults insults;
     private List<Insult> roundInsults;
-    private Insult playerInsult;
     private Insult enemyInsult;
+    private string pI;
     private int playerHealth = 5;
     private int enemyHealth = 5;
     private List<GameObject> buttons;
@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
     
 
     // Start is called before the first frame update
-    private void Start()
+    public void Start()
     {
         roundInsults = new List<Insult>();
         buttons = new List<GameObject>();
@@ -62,7 +62,6 @@ public class GameManager : MonoBehaviour
     private void StartNewGame()
     {
         insults = FileManager.LoadInsults(jsonText);
-        Debug.LogError("Select first player");
         SelectFirstPlayer();
         SetNextState();
     }
@@ -85,9 +84,9 @@ public class GameManager : MonoBehaviour
     }
 
     private void SelectFirstPlayer()
-    {
-        int startPlayer = Random.Range(0, 1);
-        if(startPlayer == 1)
+    {        
+        bool startPlayer = Random.value > 0.5;
+        if (startPlayer)
         {
             currentState = GameStates.playerInsult;
             firstPlayer = "player";
@@ -97,7 +96,6 @@ public class GameManager : MonoBehaviour
             currentState = GameStates.enemyInsult;
             firstPlayer = "enemy";
         }
-        Debug.LogError("Next player " + currentState);
     }
 
     public void SetNextState()
@@ -106,7 +104,6 @@ public class GameManager : MonoBehaviour
         {
             case GameStates.enemyInsult:
                 {
-                    Debug.LogError("EnemyInsult");
                     PrepareRoundInsults();
                     EnemyInsult();
                     currentState = GameStates.playerResponse;
@@ -116,7 +113,6 @@ public class GameManager : MonoBehaviour
 
             case GameStates.enemyResponse:
                 {
-                    Debug.LogError("EnemyResponse");
                     EnemyInsult();
                     currentState = GameStates.resolveRound;
                     SetNextState();
@@ -124,27 +120,23 @@ public class GameManager : MonoBehaviour
                 }
             case GameStates.playerInsult:
                 {
-                    Debug.LogError("PlayerInsult");
                     PrepareRoundInsults();
                     PrepareUI();
                     break;
                 }
             case GameStates.playerResponse:
                 {
-                    Debug.LogError("PlayerResonse");
                     PrepareUI();
                     currentState = GameStates.resolveRound;
                     break;
                 }
             case GameStates.resolveRound:
                 {
-                    Debug.LogError("ResolveRound");
                     ResolveRound();
                     break;
                 }
             case GameStates.selectPlayer:
                 {
-                    Debug.LogError("SelectPlayer");
                     PrepareRoundInsults();
                     break;
                 }
@@ -158,7 +150,14 @@ public class GameManager : MonoBehaviour
         {            
             GameObject insultButton = Instantiate(buttonPrefab, insultUIPrefab.transform, true);
             insultButton.transform.SetParent(insultUIPrefab.transform);
-            insultButton.GetComponentInChildren<TextMeshProUGUI>().text = insult.insultText;
+            if (firstPlayer.Equals("player")){
+                insultButton.GetComponentInChildren<TextMeshProUGUI>().text = insult.insultText;
+            }
+            else
+            {
+                insultButton.GetComponentInChildren<TextMeshProUGUI>().text = insult.counterText;
+            }
+
             insultButton.GetComponent<RectTransform>().localPosition = new Vector3(0, transform.localPosition.y + index, 0);
             AddInsultListener(insultButton.GetComponent<Button>());
             buttons.Add(insultButton);
@@ -178,7 +177,7 @@ public class GameManager : MonoBehaviour
     {
         button.onClick.AddListener(() => {
             DeleteUI();            
-            PlayerInsult(button);
+            PlayerInsult(button.GetComponentInChildren<TextMeshProUGUI>().text);
         });
     }
 
@@ -208,83 +207,78 @@ public class GameManager : MonoBehaviour
         enemyBaloon.gameObject.SetActive(true);
     }
 
-    private void PlayerInsult(Button button)
+    private void PlayerInsult(string response)
     {
         DeleteUI();
-        playerInsult = roundInsults[Random.Range(0, roundInsults.Count - 1)];
-        // TODO Catch insult
+        pI = response;
         if (currentState.Equals(GameStates.playerInsult))
         {
             currentState = GameStates.enemyResponse;
-            playerBaloon.SetText(playerInsult.insultText);
+            playerBaloon.SetText(pI);
         }
         else
         {
             currentState = GameStates.resolveRound;
-            playerBaloon.SetText(playerInsult.counterText);
+            playerBaloon.SetText(pI);
         }
         playerBaloon.gameObject.SetActive(true);
         SetNextState();
     }
 
-    // TODO Refactor this a lot of code is duplicated and is not efficient
     private void ResolveRound()
     {
         StartCoroutine(WaitRound(3));
-        //playerBaloon.gameObject.SetActive(false);
+        playerBaloon.gameObject.SetActive(false);
         enemyBaloon.gameObject.SetActive(false);
         if(firstPlayer == "player")
         {
-            if(playerInsult.counterText != enemyInsult.insultText)
+            if(pI != enemyInsult.insultText)
             {
                 // Player wins
-                Debug.LogError("Player wins");
-                enemyHealth--;
-                enemyHealthBar.sprite = healthSprites[enemyHealth];
-                playerPrefab.GetComponent<Animator>().SetTrigger("PlayerAttack");
-                playerPrefab.GetComponent<AudioSource>().clip = attackClip;
-                playerPrefab.GetComponent<AudioSource>().Play();
-                enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyHit");
-                currentState = GameStates.playerInsult;
+                PlayerAttack();
+                
             }
             else
             {
-                // Enemy parry
-                Debug.LogError("Enemy wins");
-                currentState = GameStates.enemyInsult;
-                enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
-                firstPlayer = "enemy";
-            }
+                // Enemy wins
+                EnemyAttack();               
+            }                       
         }
         else
         {
-            if(enemyInsult.counterText != playerInsult.insultText)
+            if (enemyInsult.counterText != pI)
             {
                 // Enemy wins
-                Debug.LogError("Enemy wins");
-                playerHealth--;
-                playerHealthBar.sprite = healthSprites[playerHealth];
-                currentState = GameStates.enemyInsult;
-                enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
-                playerPrefab.GetComponent<Animator>().SetTrigger("PlayerHit");
-                playerPrefab.GetComponent<AudioSource>().clip = hitClip;
-                playerPrefab.GetComponent<AudioSource>().Play();
+                EnemyAttack();
             }
             else
             {
-                // Player parry
-                Debug.LogError("Player wins");
-                currentState = GameStates.playerInsult;
-                enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
-                playerPrefab.GetComponent<Animator>().SetTrigger("PlayerAttack");
-                playerPrefab.GetComponent<AudioSource>().clip = attackClip;
-                playerPrefab.GetComponent<AudioSource>().Play();
-                // TODO play sounds here
-                firstPlayer = "player";
-            }
+                // Player wins
+                PlayerAttack();
+            }           
         }
         CheckIfGameIsEnded();
         SetNextState();
+    }
+
+    private void PlayerAttack()
+    {
+        playerPrefab.GetComponent<Animator>().SetTrigger("PlayerAttack");
+        enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyHit");
+        enemyHealth--;
+        playerHealthBar.sprite = healthSprites[enemyHealth];
+        firstPlayer = "player";
+        currentState = GameStates.playerInsult;
+    }
+
+    private void EnemyAttack()
+    {
+        enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
+        playerPrefab.GetComponent<Animator>().SetTrigger("PlayerHit");
+        playerHealth--;
+        playerHealthBar.sprite = healthSprites[playerHealth];
+        firstPlayer = "enemy";
+        currentState = GameStates.enemyInsult;
     }
 
     private IEnumerator WaitRound(float seconds)
@@ -296,6 +290,7 @@ public class GameManager : MonoBehaviour
     {
         if(playerHealth <= 0 || enemyHealth <= 0)
         {
+            playerWin = playerHealth > 0;
             SceneManager.LoadScene("EndGame");
         }
     }
