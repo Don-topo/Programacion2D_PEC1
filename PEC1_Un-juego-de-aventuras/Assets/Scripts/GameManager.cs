@@ -18,8 +18,6 @@ public class GameManager : MonoBehaviour
     public Image enemyHealthBar;
     public TextMeshProUGUI playerBaloon;
     public TextMeshProUGUI enemyBaloon;
-    public AudioClip attackClip;
-    public AudioClip hitClip;
     [HideInInspector]
     public static bool playerWin = false;
 
@@ -27,7 +25,7 @@ public class GameManager : MonoBehaviour
     private Insults insults;
     private List<Insult> roundInsults;
     private Insult enemyInsult;
-    private string pI;
+    private string playerInsult;
     private int playerHealth = 5;
     private int enemyHealth = 5;
     private List<GameObject> buttons;
@@ -70,12 +68,16 @@ public class GameManager : MonoBehaviour
     {
         pauseCanvas.gameObject.SetActive(true);
         isGamePaused = true;
+        Time.timeScale = 0f;
+        PauseUI();
     }
 
     public void ResumeGame()
-    {
+    {        
         pauseCanvas.gameObject.SetActive(false);
         isGamePaused = false;
+        Time.timeScale = 1f;
+        PauseUI();
     }
 
     public void ExitGame()
@@ -84,7 +86,7 @@ public class GameManager : MonoBehaviour
     }
 
     private void SelectFirstPlayer()
-    {        
+    {
         bool startPlayer = Random.value > 0.5;
         if (startPlayer)
         {
@@ -171,6 +173,15 @@ public class GameManager : MonoBehaviour
         {
             Destroy(button);
         }
+        buttons.Clear();
+    }
+
+    private void PauseUI()
+    {
+        foreach(GameObject button in buttons)
+        {
+            button.GetComponent<Button>().interactable = !isGamePaused;
+        }
     }
 
     private void AddInsultListener(Button button)
@@ -210,16 +221,16 @@ public class GameManager : MonoBehaviour
     private void PlayerInsult(string response)
     {
         DeleteUI();
-        pI = response;
+        playerInsult = response;
         if (currentState.Equals(GameStates.playerInsult))
         {
             currentState = GameStates.enemyResponse;
-            playerBaloon.SetText(pI);
+            playerBaloon.SetText(playerInsult);
         }
         else
         {
             currentState = GameStates.resolveRound;
-            playerBaloon.SetText(pI);
+            playerBaloon.SetText(playerInsult);
         }
         playerBaloon.gameObject.SetActive(true);
         SetNextState();
@@ -227,12 +238,11 @@ public class GameManager : MonoBehaviour
 
     private void ResolveRound()
     {
-        StartCoroutine(WaitRound(3));
         playerBaloon.gameObject.SetActive(false);
         enemyBaloon.gameObject.SetActive(false);
         if(firstPlayer == "player")
         {
-            if(pI != enemyInsult.insultText)
+            if(playerInsult != enemyInsult.insultText)
             {
                 // Player wins
                 PlayerAttack();
@@ -246,7 +256,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            if (enemyInsult.counterText != pI)
+            if (enemyInsult.counterText != playerInsult)
             {
                 // Enemy wins
                 EnemyAttack();
@@ -265,8 +275,10 @@ public class GameManager : MonoBehaviour
     {
         playerPrefab.GetComponent<Animator>().SetTrigger("PlayerAttack");
         enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyHit");
+        playerPrefab.GetComponent<AudioSource>().Play();
+        enemyPrefab.GetComponent<AudioSource>().Play();
         enemyHealth--;
-        playerHealthBar.sprite = healthSprites[enemyHealth];
+        enemyHealthBar.sprite = healthSprites[enemyHealth];
         firstPlayer = "player";
         currentState = GameStates.playerInsult;
     }
@@ -275,15 +287,12 @@ public class GameManager : MonoBehaviour
     {
         enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
         playerPrefab.GetComponent<Animator>().SetTrigger("PlayerHit");
+        playerPrefab.GetComponent<AudioSource>().Play();
+        enemyPrefab.GetComponent<AudioSource>().Play();
         playerHealth--;
         playerHealthBar.sprite = healthSprites[playerHealth];
         firstPlayer = "enemy";
         currentState = GameStates.enemyInsult;
-    }
-
-    private IEnumerator WaitRound(float seconds)
-    {
-        yield return new WaitForSecondsRealtime(seconds);
     }
 
     private void CheckIfGameIsEnded()
