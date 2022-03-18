@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI enemyBaloon;
     public AudioClip attackClip;
     public AudioClip hitClip;
+    [HideInInspector]
+    public static bool playerWin = false;
 
     private string currentState;
     private Insults insults;
@@ -31,6 +33,7 @@ public class GameManager : MonoBehaviour
     private List<GameObject> buttons;
     private string firstPlayer;
     private bool isGamePaused = false;
+
     
 
     // Start is called before the first frame update
@@ -242,8 +245,6 @@ public class GameManager : MonoBehaviour
                 playerPrefab.GetComponent<AudioSource>().clip = attackClip;
                 playerPrefab.GetComponent<AudioSource>().Play();
                 enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyHit");
-                enemyPrefab.GetComponent<AudioSource>().clip = hitClip;
-                enemyPrefab.GetComponent<AudioSource>().Play();
                 currentState = GameStates.playerInsult;
             }
             else
@@ -252,8 +253,6 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("Enemy wins");
                 currentState = GameStates.enemyInsult;
                 enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
-                enemyPrefab.GetComponent<AudioSource>().clip = attackClip;
-                enemyPrefab.GetComponent<AudioSource>().Play();
                 firstPlayer = "enemy";
             }
         }
@@ -267,8 +266,6 @@ public class GameManager : MonoBehaviour
                 playerHealthBar.sprite = healthSprites[playerHealth];
                 currentState = GameStates.enemyInsult;
                 enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
-                enemyPrefab.GetComponent<AudioSource>().clip = attackClip;
-                enemyPrefab.GetComponent<AudioSource>().Play();
                 playerPrefab.GetComponent<Animator>().SetTrigger("PlayerHit");
                 playerPrefab.GetComponent<AudioSource>().clip = hitClip;
                 playerPrefab.GetComponent<AudioSource>().Play();
@@ -279,8 +276,6 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("Player wins");
                 currentState = GameStates.playerInsult;
                 enemyPrefab.GetComponent<Animator>().SetTrigger("EnemyAttack");
-                enemyPrefab.GetComponent<AudioSource>().clip = attackClip;
-                enemyPrefab.GetComponent<AudioSource>().Play();
                 playerPrefab.GetComponent<Animator>().SetTrigger("PlayerAttack");
                 playerPrefab.GetComponent<AudioSource>().clip = attackClip;
                 playerPrefab.GetComponent<AudioSource>().Play();
