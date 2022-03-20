@@ -28,7 +28,7 @@ Si el jugador es el que insulta, basta con escoger un insulto de la lista, el en
 Por el contrario, si el jugador es el que hace la réplica, deberá fijarse en el insulto propiciado por el enemigo para escoger una réplica acorde. Si la réplica falla, el jugador pierde un punto de salud y el enemigo será el que insulta en la siguiente ronda. En cambio, si la réplica es correcta, el jugador inflingirá un punto de daño al enemigo y será el encargado de insultarlo en la próxima ronda.
 El juego continúa hasta que el jugador o el enemigo pierde todos los puntos de salud.
 
-[![Watch the video](images/Background.png)](videos/Demo.mkv)
+[Video con la demo](videos/Demo.mkv)
 
 
 # 2. Pantallas
